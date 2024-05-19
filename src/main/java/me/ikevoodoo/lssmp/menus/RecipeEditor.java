@@ -151,6 +151,7 @@ public class RecipeEditor {
                 .id("lssmp_recipe_editor_" + item.getId())
                 .page(PageData.of(9 * 5, MessageBuilder.messageOf(recipeEditorItem.getFriendlyName())))
                 .edit(page -> {
+                    page.allowNormalItemPickup(true);
                     page.fill(plugin.getItem("empty").orElseThrow().getItemStack());
 
                     drawRecipe(item.getRecipeData().choices(), page, 1, false);

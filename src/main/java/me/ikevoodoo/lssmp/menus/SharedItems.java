@@ -1,6 +1,8 @@
 package me.ikevoodoo.lssmp.menus;
 
 import me.ikevoodoo.smpcore.SMPPlugin;
+import me.ikevoodoo.smpcore.items.ItemClickResult;
+import me.ikevoodoo.smpcore.items.ItemClickState;
 import me.ikevoodoo.smpcore.text.messaging.MessageBuilder;
 import org.bukkit.Material;
 
@@ -12,6 +14,7 @@ public class SharedItems {
                 .friendlyName(MessageBuilder.messageOf("Empty"))
                 .name(() -> MessageBuilder.messageOf(" "))
                 .material(() -> Material.GRAY_STAINED_GLASS_PANE)
+                .bind((player, itemStack, itemClickResult) -> new ItemClickResult(ItemClickState.SUCCESS, true))
                 .register();
 
         plugin.createItem()
