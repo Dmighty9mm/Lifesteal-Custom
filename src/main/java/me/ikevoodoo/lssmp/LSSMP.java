@@ -161,7 +161,7 @@ public final class LSSMP extends SMPPlugin {
             meta.setOwningPlayer(player);
             var displayName = MessageBuilder
                     .builderOf("&a&lRevive ")
-                    .add(player.getName(), ChatColor.RED.asBungee()).build().text();
+                    .add(player.getName(), ChatColor.RED.asBungee()).build().legacyText();
 
             meta.setDisplayName(displayName);
 
