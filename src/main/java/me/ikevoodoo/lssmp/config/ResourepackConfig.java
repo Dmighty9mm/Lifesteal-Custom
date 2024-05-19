@@ -11,6 +11,7 @@ public interface ResourepackConfig {
    default boolean isEnabled() {
        return true;
    }
+
    @Getter
    default String url() {
        return "https://raw.githubusercontent.com/IkeVoodoo/LSSMP/v3/HeartPack.zip";
