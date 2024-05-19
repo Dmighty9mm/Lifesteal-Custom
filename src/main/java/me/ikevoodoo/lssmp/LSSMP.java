@@ -13,7 +13,6 @@ import me.ikevoodoo.lssmp.language.Language;
 import me.ikevoodoo.lssmp.language.YamlConfigSection;
 import me.ikevoodoo.lssmp.menus.RecipeEditor;
 import me.ikevoodoo.lssmp.menus.SharedItems;
-import me.ikevoodoo.lssmp.menus.selection.PlayerSelector;
 import me.ikevoodoo.smpcore.SMPPlugin;
 import me.ikevoodoo.smpcore.callbacks.eliminations.EliminationType;
 import me.ikevoodoo.smpcore.handlers.placeholders.PlaceholderHandler;
@@ -22,9 +21,12 @@ import me.ikevoodoo.smpcore.utils.ExceptionUtils;
 import me.ikevoodoo.smpcore.utils.Lazy;
 import me.ikevoodoo.smpcore.utils.StringUtils;
 import me.ikevoodoo.smpcore.utils.ThreadUtils;
+import me.ikevoodoo.spigotcore.gui.commons.select.ItemSelector;
+import me.ikevoodoo.spigotcore.gui.commons.select.player.PlayerSelectionConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +50,7 @@ public final class LSSMP extends SMPPlugin {
 
     public static final int CURRENT_CONFIG_VERSION = 11;
     private final Lazy<Language> lazyLanguage;
-    private PlayerSelector playerSelector;
+    private ItemSelector<OfflinePlayer> playerSelector;
 
     public LSSMP() {
         this.lazyLanguage = new Lazy<>(() -> new Language(this));
@@ -69,7 +71,7 @@ public final class LSSMP extends SMPPlugin {
 
     @Override
     public void whenEnabled() {
-        this.playerSelector = new PlayerSelector(this);
+        this.playerSelector = new ItemSelector<>(this, "Select a player.");
 
         this.loadHealthHandler();
 
@@ -151,7 +153,8 @@ public final class LSSMP extends SMPPlugin {
     }
 
     private void updatePlayerSelector() {
-        this.getPlayerSelector().setupPages(getEliminationHandler().getEliminatedPlayers().keySet().stream().map(Bukkit::getOfflinePlayer).toList(), player -> {
+        var players = getEliminationHandler().getEliminatedPlayers().keySet().stream().map(Bukkit::getOfflinePlayer).toList();
+        this.getPlayerSelector().setupPages(players, new PlayerSelectionConverter(player -> {
             var item = new ItemStack(Material.PLAYER_HEAD);
             var meta = (SkullMeta) item.getItemMeta();
             assert meta != null;
@@ -165,7 +168,7 @@ public final class LSSMP extends SMPPlugin {
             item.setItemMeta(meta);
 
             return item;
-        });
+        }));
     }
 
     @Override
@@ -220,7 +223,7 @@ public final class LSSMP extends SMPPlugin {
         ThreadUtils.stop(0xD00D);
     }
 
-    public PlayerSelector getPlayerSelector() {
+    public ItemSelector<OfflinePlayer> getPlayerSelector() {
         return this.playerSelector;
     }
 
