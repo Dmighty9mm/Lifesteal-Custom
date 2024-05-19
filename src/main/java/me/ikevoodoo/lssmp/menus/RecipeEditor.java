@@ -171,6 +171,8 @@ public class RecipeEditor {
                                     for (RecipeChoice choice : choices) {
                                         shapelessRecipe.addIngredient(choice);
                                     }
+
+                                    toWrite = shapelessRecipe;
                                 }
                                 if (toWrite != null)
                                     plugin.getRecipeLoader().writeRecipe(item.getRecipeFile(), new RecipeData(toWrite, mats, choices), replacements);
