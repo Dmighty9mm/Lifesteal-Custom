@@ -226,7 +226,6 @@ public class RecipeEditor {
         for (int x = 0, width = stacks.length / 3; x < width; x++) {
             for (int y = 0, height = stacks.length / 3; y < height; y++) {
                 var stack = page.item(player, (11 + x + offsetX) + (9 * y)).orElseGet(() -> new ItemStack(Material.AIR));
-                System.out.println(stack);
                 stacks[x + y * width] = stack;
             }
         }
