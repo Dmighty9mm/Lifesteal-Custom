@@ -209,7 +209,13 @@ public class RecipeEditor {
                 else if (choice instanceof RecipeChoice.ExactChoice exactChoice)
                     stack = exactChoice.getItemStack();
 
-                if (stack == null) continue;
+                var index = (11 + x + offsetX) + (9 * y);
+
+                if (stack == null) {
+                    page.item(ItemData.of(index, new ItemStack(Material.AIR)));
+                    continue;
+                }
+
                 ItemMeta meta = stack.getItemMeta();
                 if (meta != null && removePdc) {
                     PersistentDataContainer pdc = meta.getPersistentDataContainer();
@@ -218,7 +224,7 @@ public class RecipeEditor {
                     stack.setItemMeta(meta);
                 }
 
-                page.item(ItemData.of((11 + x + offsetX) + (9 * y), stack));
+                page.item(ItemData.of(index, stack));
             }
         }
     }
