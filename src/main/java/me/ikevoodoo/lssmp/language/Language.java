@@ -6,7 +6,6 @@ import dev.refinedtech.configlang.ConfigStructure;
 import dev.refinedtech.configlang.scope.Scope;
 import me.ikevoodoo.smpcore.SMPPlugin;
 import me.ikevoodoo.smpcore.senders.CustomSender;
-import me.ikevoodoo.smpcore.senders.SenderBuilder;
 import me.ikevoodoo.smpcore.shared.PluginProvider;
 import me.ikevoodoo.smpcore.utils.ClassUtils;
 import org.bukkit.Bukkit;
@@ -52,7 +51,7 @@ public class Language extends PluginProvider {
                 if (logToSender)
                     Bukkit.dispatchCommand(commandSender, command);
                 else
-                    Bukkit.dispatchCommand(SenderBuilder.createNewSender(CustomSender.as().noLog().sender(commandSender)), command);
+                    Bukkit.dispatchCommand(CustomSender.as().sender(commandSender).log(false), command);
 
                 return null;
             }

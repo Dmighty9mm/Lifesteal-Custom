@@ -58,40 +58,28 @@ public record BanTimeData(
     }
 
     private static Some<Long> parseBanTime(String time) {
-        var split = time.split(":");
-        if (split.length != 3)
+        var value = StringUtils.parseBanTime(time);
+        if (value == -1) {
             return Some.error(new ConfigError(null, "Time is not in the format hh:mm:ss"));
-
-        var splitTime = new String[4];
-        splitTime[0] = split[0];
-        splitTime[1] = split[1];
-        splitTime[3] = "0";
-
-        if (split[2].contains(".")) {
-            var split2 = split[2].split("\\.");
-            splitTime[2] = split2[0];
-            splitTime[3] = split2[1];
-        } else {
-            splitTime[2] = split[2];
         }
 
-        var hours = parseLong(splitTime[0]);
-        if (hours.isError())
-            return Some.error(hours.error().addKey("hours"));
+        if (value == -2) {
+            return Some.error(new ConfigError("hours", "Could not parse number"));
+        }
 
-        var minutes = parseLong(splitTime[1]);
-        if (minutes.isError())
-            return Some.error(minutes.error().addKey("minutes"));
+        if (value == -3) {
+            return Some.error(new ConfigError("minutes", "Could not parse number"));
+        }
 
-        var seconds = parseLong(splitTime[2]);
-        if (seconds.isError())
-            return Some.error(seconds.error().addKey("seconds"));
+        if (value == -4) {
+            return Some.error(new ConfigError("seconds", "Could not parse number"));
+        }
 
-        var millis = parseLong(splitTime[3]);
-        if (millis.isError())
-            return Some.error(millis.error().addKey("millis"));
+        if (value == -5) {
+            return Some.error(new ConfigError("millis", "Could not parse number"));
+        }
 
-        return Some.of(hours.key() * 3600000L + minutes.key() * 60000L + seconds.key() * 1000L + millis.key());
+        return Some.of(value);
     }
 
     private static Some<Long> parseLong(String str) {

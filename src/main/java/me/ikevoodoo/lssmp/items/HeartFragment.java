@@ -2,10 +2,13 @@ package me.ikevoodoo.lssmp.items;
 
 import me.ikevoodoo.smpcore.SMPPlugin;
 import me.ikevoodoo.smpcore.items.CustomItem;
+import me.ikevoodoo.smpcore.items.ItemClickResult;
+import me.ikevoodoo.smpcore.items.ItemClickState;
 import me.ikevoodoo.smpcore.text.messaging.MessageBuilder;
 import me.ikevoodoo.smpcore.utils.Pair;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
@@ -28,5 +31,10 @@ public class HeartFragment extends CustomItem {
     public Pair<NamespacedKey, Recipe> createRecipe() {
         unlockOnObtain(getRecipeData().materials());
         return new Pair<>(makeKey("heart_fragment_item_recipe"), getRecipeData().recipe());
+    }
+
+    @Override
+    protected ItemClickResult onClick(Player player, ItemStack itemStack, Action action) {
+        return new ItemClickResult(ItemClickState.SUCCESS, false);
     }
 }

@@ -52,7 +52,6 @@ public class ReviveBeacon extends CustomItem {
 
             getPlugin(LSSMP.class).getPlayerSelector().openFor(player, new PlayerReviveCallback(getPlugin()));
 
-            // getPlugin().getMenuHandler().get("lssmp_revive_beacon_menu").open(player);
             return new ItemClickResult(ItemClickState.IGNORE, true);
         }
 

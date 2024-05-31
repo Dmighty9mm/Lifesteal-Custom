@@ -16,12 +16,21 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.RecipeChoice;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class RecipeEditor {
 
@@ -57,7 +66,7 @@ public class RecipeEditor {
                 page.first(5, plugin.getItem("prev").orElseThrow().getItemStack());
             }
 
-            drawRecipe(choices, page, 0);
+            drawRecipe(choices, page, 0, true);
 
             page.item(ItemData.of(24, item.getCleanStack()));
 
@@ -142,9 +151,10 @@ public class RecipeEditor {
                 .id("lssmp_recipe_editor_" + item.getId())
                 .page(PageData.of(9 * 5, MessageBuilder.messageOf(recipeEditorItem.getFriendlyName())))
                 .edit(page -> {
+                    page.allowNormalItemPickup(true);
                     page.fill(plugin.getItem("empty").orElseThrow().getItemStack());
 
-                    drawRecipe(item.getRecipeData().choices(), page, 1);
+                    drawRecipe(item.getRecipeData().choices(), page, 1, false);
 
                     plugin
                             .createItem()
@@ -166,14 +176,18 @@ public class RecipeEditor {
                                         shapedRecipe.setIngredient((i + "").charAt(0), choices[i]);
                                     }
                                     toWrite = shapedRecipe;
-                                } else if (recipe instanceof ShapelessRecipe shapeless){
+                                } else if (recipe instanceof ShapelessRecipe shapeless) {
                                     ShapelessRecipe shapelessRecipe = new ShapelessRecipe(shapeless.getKey(), shapeless.getResult());
                                     for (RecipeChoice choice : choices) {
                                         shapelessRecipe.addIngredient(choice);
                                     }
+
+                                    toWrite = shapelessRecipe;
                                 }
-                                if (toWrite != null)
+                                if (toWrite != null) {
                                     plugin.getRecipeLoader().writeRecipe(item.getRecipeFile(), new RecipeData(toWrite, mats, choices), replacements);
+                                }
+
                                 plugin.reload();
                                 plugin.getMenuHandler().get("lssmp_recipe_settings_" + item.getId()).open(player);
                             })
@@ -185,7 +199,7 @@ public class RecipeEditor {
                 .register();
     }
 
-    private static void drawRecipe(RecipeChoice[] choices, MenuPage page, int offsetX) {
+    private static void drawRecipe(RecipeChoice[] choices, MenuPage page, int offsetX, boolean removePdc) {
         for (int x = 0, width = choices.length / 3; x < width; x++) {
             for (int y = 0, height = choices.length / 3; y < height; y++) {
                 RecipeChoice choice = choices[x + y * width];
@@ -195,16 +209,22 @@ public class RecipeEditor {
                 else if (choice instanceof RecipeChoice.ExactChoice exactChoice)
                     stack = exactChoice.getItemStack();
 
-                if (stack == null) continue;
+                var index = (11 + x + offsetX) + (9 * y);
+
+                if (stack == null) {
+                    page.item(ItemData.of(index, new ItemStack(Material.AIR)));
+                    continue;
+                }
+
                 ItemMeta meta = stack.getItemMeta();
-                if (meta != null) {
+                if (meta != null && removePdc) {
                     PersistentDataContainer pdc = meta.getPersistentDataContainer();
                     Set<NamespacedKey> copy = new HashSet<>(pdc.getKeys());
                     copy.forEach(pdc::remove);
                     stack.setItemMeta(meta);
                 }
 
-                page.item(ItemData.of((11 + x + offsetX) + (9 * y), stack));
+                page.item(ItemData.of(index, stack));
             }
         }
     }
@@ -212,7 +232,8 @@ public class RecipeEditor {
     private static ItemStack[] getStacks(ItemStack[] stacks, MenuPage page, Player player, int offsetX) {
         for (int x = 0, width = stacks.length / 3; x < width; x++) {
             for (int y = 0, height = stacks.length / 3; y < height; y++) {
-                stacks[x + y * width] = page.item(player, (11 + x + offsetX) + (9 * y)).orElseGet(() -> new ItemStack(Material.AIR));
+                var stack = page.item(player, (11 + x + offsetX) + (9 * y)).orElseGet(() -> new ItemStack(Material.AIR));
+                stacks[x + y * width] = stack;
             }
         }
         return stacks;
